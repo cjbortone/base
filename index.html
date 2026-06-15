@@ -383,6 +383,16 @@
   .day-bar .d { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
   .day-bar .v { font-size: 14px; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
   .day-bar .u { font-size: 8px; color: var(--fg-muted); text-transform: uppercase; }
+
+  /* How-to form panels */
+  .howto { margin: 0 0 10px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-elev); }
+  .howto summary { cursor: pointer; list-style: none; padding: 7px 10px; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .howto summary::-webkit-details-marker { display: none; }
+  .howto summary::before { content: '\25B8  '; }
+  .howto[open] summary::before { content: '\25BE  '; }
+  .howto-body { padding: 0 10px 8px; }
+  .howto-row { font-size: 12.5px; color: var(--fg-dim); line-height: 1.5; margin-bottom: 6px; }
+  .howto-label { display: inline-block; min-width: 52px; color: var(--fg); font-weight: 600; margin-right: 6px; }
 </style>
 </head>
 <body>
@@ -445,11 +455,11 @@
 
 <script>
 const DAYS = [
-  { key: 'mon', short: 'MON', name: 'Pull', type: 'lift', skinType: 'active' },
+  { key: 'mon', short: 'MON', name: 'Full Body A', type: 'lift', skinType: 'active' },
   { key: 'tue', short: 'TUE', name: 'Feet', type: 'mobility', skinType: 'strip' },
-  { key: 'wed', short: 'WED', name: 'Push', type: 'lift', skinType: 'active' },
+  { key: 'wed', short: 'WED', name: 'Full Body B', type: 'lift', skinType: 'active' },
   { key: 'thu', short: 'THU', name: 'Hips', type: 'mobility', skinType: 'recovery' },
-  { key: 'fri', short: 'FRI', name: 'Legs', type: 'lift', skinType: 'active' },
+  { key: 'fri', short: 'FRI', name: 'Full Body C', type: 'lift', skinType: 'active' },
   { key: 'sat', short: 'SAT', name: 'Walk', type: 'rest', skinType: 'recovery' },
   { key: 'sun', short: 'SUN', name: 'Reset', type: 'rest', skinType: 'reset' },
 ];
@@ -494,7 +504,15 @@ function parseTargetReps(rx) {
 }
 
 function demoLink(name) {
-  return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(name + ' exercise form gif')}`;
+  // Clean the display name into a good query, then search YouTube (videos beat
+  // random image gifs). Drops parentheticals, set/rep counts, side/leg notes.
+  const q = name
+    .replace(/\([^)]*\)/g, '')
+    .replace(/\d+\s*×[^,]*/g, '')
+    .replace(/\/side|\/leg|\/dir/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(q + ' proper form')}`;
 }
 
 // ============ PROTOCOLS ============
@@ -502,22 +520,20 @@ function demoLink(name) {
 const AM_PROTOCOL = {
   title: 'AM Protocol', duration: '5 min', phase: 'AM', type: 'protocol',
   steps: [
-    { name: 'Lymphatic Shake', detail: '60s · Heels down, pump knees, shake hands. Just vibrate.' },
-    { name: 'Teacup Reach', detail: '60s · 2s high/low reach, 2s hold, 2s switch. Open the ribs.' },
-    { name: 'Deep Squat Hold', detail: '60s · Drop into squat, hold doorframe, lean back for tall spine.' },
-    { name: 'Active Dead Hang', detail: '60s · Pull shoulders down 1 inch. Push chest through arms. Breathe.' },
-    { name: 'Chin Tucks (Wall)', detail: '30s · Pull chin back, grow TALL, hold 5s, release 2s. Back of head on wall.' },
+    { name: '360 Breathing', detail: '2 min · Hands on lower ribs. 4s nose inhale into the sides and back, 8s mouth exhale. Sets rib position, down-regulates.', timer: 120 },
+    { name: 'Deep Squat Hold', detail: '60s · Drop into a squat, hold a doorframe, sit tall. Hips, ankles, pelvic floor.' },
+    { name: 'Chin Tucks (Wall)', detail: '30s · Back of head on wall, pull chin straight back, grow tall, 5s hold / 2s release. Forward head.' },
+    { name: 'Active Hang', detail: '30s · Hang from the bar, pull shoulders down and back. Active, feet-assisted if needed — not a dead passive hang. Mind the shoulder.' },
   ],
 };
 
 const PM_PROTOCOL = {
-  title: 'PM Protocol', duration: '10 min', phase: 'PM', type: 'protocol',
+  title: 'PM Protocol', duration: '9 min', phase: 'PM', type: 'protocol',
   steps: [
-    { name: 'Thoracic Extension (Roller)', detail: '2 min · Roller at bra-line. Lean BACK. Ribs down. 5s holds, move up, repeat.' },
-    { name: 'Wall Angels', detail: '10 reps · 3s up, 1s hold, 3s down. Head, shoulders, butt, heels all on wall.' },
-    { name: 'Psoas Release (Ball)', detail: '2 min/side · Face down on ball inside hip bone. 4s inhale, 6s exhale.', timer: 120 },
-    { name: '90/90 Breathing', detail: '3 min · 4s nose inhale, 8s mouth exhale. Legs on chair, 90/90.', timer: 180 },
-    { name: 'Single Leg Balance', detail: 'Brushing teeth · One leg. Free reps.' },
+    { name: '90/90 Breathing', detail: '3 min · Legs on a chair. 4s nose inhale, 8s mouth exhale. On each exhale let the pelvic floor fully RELEASE — no clenching, no kegels.', timer: 180 },
+    { name: 'Thoracic Extension (Roller)', detail: '2 min · Roller at the bra-line. Lean back, ribs down, 5s holds, move up, repeat.', timer: 120 },
+    { name: 'Psoas Release (Ball)', detail: '2 min/side · Face down, ball inside the hip bone. Breathe and sink. Hip flexor, APT.', timer: 120 },
+    { name: 'Hip-Opening Down-Train', detail: '2 min · Happy baby then butterfly. Full exhale, let everything go. Pelvic floor down-training — log the 0-10.', timer: 120 },
   ],
 };
 
@@ -652,250 +668,148 @@ const WARMUP_LEGS = {
 // Exercises have: name, rx, rpe, rest, warmups, workingWeight, cue
 
 const WORKOUTS = {
+
+  // ---------- MON: FULL BODY A — hinge + horizontal ----------
   mon: {
-    full: {
-      blocks: [
-        { name: 'Main Lifts', exercises: [
-          { name: 'Rack Pull (Barbell)', rx: '3×5', rpe: '9/7 wave', rest: '2.5-3 min', track: true,
-            warmups: [{ weight: 45, reps: 5 }, { weight: 95, reps: 5 }, { weight: 145, reps: 3 }],
-            workingWeight: 195,
-            cue: '1s up (explosive), 1s squeeze glutes, 2s down. Dead stop on pins. Odd weeks RPE 9, even RPE 7.' },
-          { name: 'Bench Supported DB Rows', rx: '3×10', rpe: '8', rest: '90s', track: true,
-            warmups: [{ weight: 17.5, reps: 8 }],
-            workingWeight: 40,
-            cue: '2s pull, 1s pause squeezing blades, 2s lower, 1s reach forward. The reach is the posture fix.' },
-          { name: 'Cable Flys (Low to High)', rx: '2×15', rpe: '7.5', rest: '60s', track: true,
-            warmups: [{ weight: 2.5, reps: 8 }],
-            workingWeight: 12.5,
-            cue: '2s sweep up, 2s squeeze at chin, 2s return. Chest not shoulders.' },
-          { name: 'Half-Kneeling 1-Arm Lat Pulldown', rx: '3×15/side', rpe: '8.5', rest: '60-90s', track: true,
-            warmups: [{ weight: 12.5, reps: 8 }],
-            workingWeight: 27.5,
-            cue: '2s pull, 1s squeeze bottom, 3s slow return. Squeeze glute of kneeling leg HARD.' },
-          { name: 'Face Pull (Cable)', rx: '3×15', rpe: 'Form', rest: '45-60s', track: true,
-            warmups: [{ weight: 12.5, reps: 8 }],
-            workingWeight: 27.5,
-            cue: '2s pull to FOREHEAD, 2s squeeze, 2s return.' },
-        ]},
-        { name: 'V-Taper Builder', exercises: [
-          { name: 'Chin-Ups', rx: '3×AMRAP', rpe: 'Form', rest: '2 min', track: true,
-            workingWeight: 'BW',
-            cue: '2s pull, 1s hold chin over bar, 3s slow negative. Even 2 good reps count.' },
-        ]},
-      ],
-    },
-    quick: {
-      blocks: [
-        { name: 'Main Lifts (Quick)', exercises: [
-          { name: 'Rack Pull (Barbell)', rx: '3×5', rpe: '9/7 wave', rest: '60s', track: true,
-            warmups: [{ weight: 45, reps: 5 }, { weight: 145, reps: 3 }],
-            workingWeight: 195,
-            cue: 'Dead stop on pins. Fewer warm-ups, tighter rest.' },
-          { name: 'Bench Supported DB Rows', rx: '3×10', rpe: '8', rest: '60s', track: true,
-            workingWeight: 40,
-            cue: 'Skip warm-up, jump straight to working weight.' },
-          { name: 'Chin-Ups', rx: '3×AMRAP', rpe: 'Form', rest: '60s', track: true,
-            workingWeight: 'BW',
-            cue: 'Slow negatives.' },
-          { name: 'Face Pull (Cable)', rx: '2×15', rpe: 'Form', rest: '45s', track: true,
-            workingWeight: 27.5,
-            cue: 'Pull to forehead, squeeze hard.' },
-        ]},
-      ],
-    },
-    home: {
-      blocks: [
-        { name: 'Main Lifts (@Home)', exercises: [
-          { name: 'KB Romanian Deadlift (2-hand)', rx: '3×8', rpe: '8', rest: '90s', track: true,
-            warmups: [{ weight: 25, reps: 8 }],
-            workingWeight: 42,
-            cue: 'Hinge at hips. 2s down, 1s pause at mid-shin, 1s up. Replaces rack pull.' },
-          { name: 'DB Row (Bench Supported)', rx: '3×10', rpe: '8', rest: '90s', track: true,
-            warmups: [{ weight: 20, reps: 8 }],
-            workingWeight: 50,
-            cue: '2s pull, 1s squeeze, 2s lower, 1s reach forward. Same as gym.' },
-          { name: 'Band Fly (Low to High)', rx: '2×15', rpe: 'Form', rest: '60s', track: true,
-            workingWeight: 'Band',
-            cue: 'Anchor band low. Sweep up and squeeze at chin height.' },
-          { name: 'Banded Lat Pulldown', rx: '3×15', rpe: '8', rest: '60s', track: true,
-            workingWeight: 'Band',
-            cue: 'Anchor overhead. Kneel or seated. 2s pull, 3s return.' },
-          { name: 'Band Face Pull', rx: '3×15', rpe: 'Form', rest: '45s', track: true,
-            workingWeight: 'Band',
-            cue: 'Anchor at eye level. Pull to forehead, squeeze.' },
-        ]},
-        { name: 'V-Taper Builder', exercises: [
-          { name: 'Chin-Ups', rx: '3×AMRAP', rpe: 'Form', rest: '2 min', track: true,
-            workingWeight: 'BW',
-            cue: 'Same as gym.' },
-        ]},
-      ],
-    },
+    full: { blocks: [
+      { name: 'Full Body A', exercises: [
+        { name: 'KB Romanian Deadlift (2-hand)', rx: '3×8', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 20, reps: 8 }], workingWeight: 35,
+          cue: 'Hinge. 2s down to mid-shin, 1s pause, 1s up. Full ROM, no max bracing (keeps the pelvic floor calm). Double progression: top of range at 7-8 on all sets → add load.' },
+        { name: 'Low-Incline DB Press (Neutral)', rx: '3×8-10', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 20, reps: 8 }], workingWeight: 35,
+          cue: 'Bench 15-30°, palms facing. 2s press, 3s lower to a deep stretch. Top of range at 7-8 → add load.' },
+        { name: 'Chest-Supported DB Row', rx: '3×10', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 20, reps: 8 }], workingWeight: 35,
+          cue: '2s pull, 1s squeeze the blades, 2s lower, 1s reach. Your rounded-shoulder muscle — build it.' },
+        { name: 'Pallof Press', rx: '3×10/side', rpe: '7', rest: '60s', track: true,
+          workingWeight: 'Band/Cable', cue: 'Press straight out, resist the twist, ribs down. Anti-rotation.' },
+        { name: 'Suitcase Carry', rx: '3×30s/side', rpe: '7-8', rest: '60s', track: true,
+          workingWeight: 35, cue: 'One KB. Tall, ribs down, no lean. Progress the load.' },
+        { name: 'Lateral Raise', rx: '2×12-15', rpe: '8-9', rest: '45s', track: true,
+          workingWeight: 12.5, cue: 'Soft elbows, to shoulder height. Last set near failure. Delt width.' },
+      ]},
+      { name: 'End-Range Finish', exercises: [
+        { name: 'Loaded Hinge Stretch Hold', rx: '2×30s', rpe: 'Stretch', rest: '30s', track: false,
+          workingWeight: 25, cue: 'Light KB, hinge to end-range hamstring, hold and breathe.' },
+        { name: 'Couch Stretch', rx: '1 min/side', rpe: 'Stretch', rest: 'ss', track: false,
+          workingWeight: 'BW', cue: 'Back foot up, squeeze glute, tuck pelvis. Hip-flexor length for APT.' },
+      ]},
+    ]},
+    quick: { blocks: [
+      { name: 'Full Body A (Quick)', exercises: [
+        { name: 'KB Romanian Deadlift (2-hand)', rx: '2×8', rpe: '7-8', rest: '60s', track: true, workingWeight: 35, cue: 'Hinge, no max bracing.' },
+        { name: 'Low-Incline DB Press (Neutral)', rx: '2×8-10', rpe: '7-8', rest: '60s', track: true, workingWeight: 35, cue: 'Deep stretch at the bottom.' },
+        { name: 'Chest-Supported DB Row', rx: '2×10', rpe: '7-8', rest: '60s', track: true, workingWeight: 35, cue: 'Pull, squeeze, reach.' },
+        { name: 'Pallof Press', rx: '2×10/side', rpe: '7', rest: '45s', track: true, workingWeight: 'Band/Cable', cue: 'Resist the twist.' },
+        { name: 'Suitcase Carry', rx: '2×30s/side', rpe: '7-8', rest: '45s', track: true, workingWeight: 35, cue: 'Tall, ribs down.' },
+      ]},
+    ]},
+    home: { blocks: [
+      { name: 'Full Body A (@Home)', exercises: [
+        { name: 'KB Romanian Deadlift (2-hand)', rx: '3×8', rpe: '7-8', rest: '90s', track: true, warmups: [{ weight: 25, reps: 8 }], workingWeight: 42, cue: 'Max 42 lb KB. Hinge, no max bracing.' },
+        { name: 'Low-Incline DB Press (Neutral)', rx: '3×8-10', rpe: '7-8', rest: '90s', track: true, warmups: [{ weight: 25, reps: 8 }], workingWeight: 35, cue: 'Same as gym.' },
+        { name: 'Chest-Supported DB Row', rx: '3×10', rpe: '7-8', rest: '90s', track: true, warmups: [{ weight: 20, reps: 8 }], workingWeight: 35, cue: 'Pull, squeeze, reach.' },
+        { name: 'Band Pallof Press', rx: '3×10/side', rpe: '7', rest: '60s', track: true, workingWeight: 'Band', cue: 'Anchor at chest height.' },
+        { name: 'Suitcase Carry', rx: '3×30s/side', rpe: '7-8', rest: '60s', track: true, workingWeight: 42, cue: 'Tall, ribs down, no lean.' },
+        { name: 'Lateral Raise', rx: '2×12-15', rpe: '8-9', rest: '45s', track: true, workingWeight: 12.5, cue: 'Last set near failure.' },
+      ]},
+    ]},
   },
+
+  // ---------- WED: FULL BODY B — squat + vertical ----------
   wed: {
-    full: {
-      blocks: [
-        { name: 'Main Lifts', exercises: [
-          { name: 'Half-Kneeling Landmine Press', rx: '3×8/side', rpe: '7.5', rest: '90s', track: true,
-            warmups: [{ weight: 45, reps: 8 }],
-            workingWeight: 75,
-            cue: '1s press (punch ceiling), 1s hold top, 2s lower. Lean forward. Squeeze kneeling glute.' },
-          { name: 'Low-Incline DB Press (Neutral)', rx: '3×10', rpe: '8', rest: '90s', track: true,
-            warmups: [{ weight: 25, reps: 8 }],
-            workingWeight: 50,
-            cue: '2s press, 1s hold top, 3s lower to deep stretch. Bench 15-30°. Palms face each other.' },
-        ]},
-        { name: '3D Superset (3 rounds, 60s rest)', exercises: [
-          { name: 'Lu Raises', rx: '3×15', rpe: '9.5', rest: 'SS', track: true,
-            workingWeight: 10,
-            cue: '2s raise, 1s touch plates overhead, 3s negative. Full ROM.' },
-          { name: 'Prone Y-Raises', rx: '3×15', rpe: '9.5', rest: '60s', track: true,
-            workingWeight: 5,
-            cue: '2s raise (thumbs up), 1s squeeze blades, 2s lower.' },
-        ]},
-        { name: 'Accessories', exercises: [
-          { name: 'Tricep Pushdowns', rx: '3×15', rpe: 'Failure on last', rest: '45-60s', track: true,
-            warmups: [{ weight: 17.5, reps: 8 }],
-            workingWeight: 37.5,
-            cue: '1s push, 1s split rope and squeeze, 2s return. Elbows pinned.' },
-        ]},
-        { name: 'Vanity Finishers', exercises: [
-          { name: 'Preacher Curl (Dumbbell)', rx: '2×10-12', rpe: 'Failure', rest: '60s', track: true,
-            warmups: [{ weight: 40, reps: 8 }],
-            workingWeight: 80,
-            cue: '2s curl, 1s squeeze top, 3s lower to full stretch.' },
-        ]},
-      ],
-    },
-    quick: {
-      blocks: [
-        { name: 'Main Lifts (Quick)', exercises: [
-          { name: 'Half-Kneeling Landmine Press', rx: '3×8/side', rpe: '7.5', rest: '60s', track: true,
-            warmups: [{ weight: 45, reps: 8 }],
-            workingWeight: 75,
-            cue: 'Main pressing movement.' },
-          { name: 'Low-Incline DB Press (Neutral)', rx: '3×10', rpe: '8', rest: '60s', track: true,
-            workingWeight: 50,
-            cue: 'Skip warm-up after press.' },
-          { name: 'Lu Raises + Y-Raises', rx: '2 rounds × 15', rpe: '9', rest: '60s', track: true,
-            workingWeight: 10,
-            cue: 'Superset. Fewer rounds.' },
-          { name: 'Tricep Pushdowns', rx: '2×15', rpe: 'Failure', rest: '45s', track: true,
-            workingWeight: 37.5,
-            cue: 'Elbows pinned.' },
-        ]},
-      ],
-    },
-    home: {
-      blocks: [
-        { name: 'Main Lifts (@Home)', exercises: [
-          { name: 'DB Z-Press (Seated Floor)', rx: '3×8', rpe: '8', rest: '90s', track: true,
-            warmups: [{ weight: 25, reps: 8 }],
-            workingWeight: 45,
-            cue: 'Sit on floor, legs straight out. Strictly vertical press. Replaces landmine.' },
-          { name: 'Low-Incline DB Press (Neutral)', rx: '3×10', rpe: '8', rest: '90s', track: true,
-            warmups: [{ weight: 25, reps: 8 }],
-            workingWeight: 50,
-            cue: 'Same as gym.' },
-        ]},
-        { name: '3D Superset (3 rounds)', exercises: [
-          { name: 'Lu Raises', rx: '3×15', rpe: '9.5', rest: 'SS', track: true,
-            workingWeight: 10,
-            cue: 'Same as gym.' },
-          { name: 'Prone Y-Raises (Bench)', rx: '3×15', rpe: '9.5', rest: '60s', track: true,
-            workingWeight: 5,
-            cue: 'Chest-supported on incline bench.' },
-        ]},
-        { name: 'Accessories', exercises: [
-          { name: 'Overhead DB Tricep Extension', rx: '3×15', rpe: 'Failure on last', rest: '45-60s', track: true,
-            warmups: [{ weight: 15, reps: 8 }],
-            workingWeight: 30,
-            cue: 'Two-hand grip one DB behind head. Elbows tight.' },
-        ]},
-        { name: 'Vanity Finishers', exercises: [
-          { name: 'Seated DB Curl', rx: '2×10-12', rpe: 'Failure', rest: '60s', track: true,
-            workingWeight: 30,
-            cue: 'On bench. Strict. No swinging.' },
-        ]},
-      ],
-    },
+    full: { blocks: [
+      { name: 'Full Body B', exercises: [
+        { name: 'KB Goblet Squat', rx: '3×8', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 20, reps: 8 }, { weight: 30, reps: 5 }], workingWeight: 35,
+          cue: '3s down, 1s hold the bottom, 2s up. Vertical torso, full depth, heels flat. Top of range at 7-8 → add load.' },
+        { name: 'Half-Kneeling Landmine Press', rx: '3×8/side', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 45, reps: 8 }], workingWeight: 55,
+          cue: 'Ribs down, squeeze the down-leg glute. 1s up, 2s down. Progress the load.' },
+        { name: 'Half-Kneeling 1-Arm Lat Pulldown', rx: '3×10-12/side', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 12.5, reps: 8 }], workingWeight: 22.5, cue: '2s pull to the ribs, 3s slow return.' },
+        { name: 'Dead Bug', rx: '3×8/side', rpe: 'Form', rest: '45s', track: false,
+          workingWeight: 'BW', cue: 'Low back flat, ribs down, opposite arm/leg slow. The APT brake.' },
+        { name: 'Farmer Carry', rx: '3×40s', rpe: '7-8', rest: '60s', track: true,
+          workingWeight: 42, cue: 'Two KBs. Tall, ribs down. Progress the load.' },
+        { name: 'Prone Y-Raise', rx: '3×12', rpe: '7', rest: '45s', track: true,
+          workingWeight: 7.5, cue: 'Face down, arms to a Y, thumbs up. Squeeze the LOWER traps.' },
+      ]},
+      { name: 'End-Range Finish', exercises: [
+        { name: 'Wall Slide (End-Range Hold)', rx: '2×8', rpe: 'Form', rest: '45s', track: false,
+          workingWeight: 'BW', cue: 'Slide overhead to end range, hold 3-5s at the top. Serratus + shoulder ER. Or sub a banded supine overhead pulldown (lying pins the ribs).' },
+        { name: 'Deep Squat Hold', rx: '1 min', rpe: 'Stretch', rest: 'ss', track: false,
+          workingWeight: 'BW', cue: 'Sit tall in a deep squat, breathe.' },
+      ]},
+    ]},
+    quick: { blocks: [
+      { name: 'Full Body B (Quick)', exercises: [
+        { name: 'KB Goblet Squat', rx: '2×8', rpe: '7-8', rest: '60s', track: true, warmups: [{ weight: 20, reps: 8 }], workingWeight: 35, cue: 'Vertical, hold the bottom.' },
+        { name: 'Half-Kneeling Landmine Press', rx: '2×8/side', rpe: '7-8', rest: '60s', track: true, workingWeight: 55, cue: 'Ribs down.' },
+        { name: 'Half-Kneeling 1-Arm Lat Pulldown', rx: '2×10-12/side', rpe: '7-8', rest: '60s', track: true, workingWeight: 22.5, cue: 'Slow return.' },
+        { name: 'Dead Bug', rx: '2×8/side', rpe: 'Form', rest: '45s', track: false, workingWeight: 'BW', cue: 'Ribs down.' },
+        { name: 'Farmer Carry', rx: '2×40s', rpe: '7-8', rest: '45s', track: true, workingWeight: 42, cue: 'Tall, ribs down.' },
+      ]},
+    ]},
+    home: { blocks: [
+      { name: 'Full Body B (@Home)', exercises: [
+        { name: 'KB Goblet Squat', rx: '3×8', rpe: '7-8', rest: '90s', track: true, warmups: [{ weight: 20, reps: 8 }], workingWeight: 42, cue: 'Max 42 lb KB.' },
+        { name: 'Half-Kneeling 1-Arm KB Press', rx: '3×8/side', rpe: '7-8', rest: '90s', track: true, warmups: [{ weight: 20, reps: 8 }], workingWeight: 35, cue: 'Ribs down, squeeze glute. Replaces landmine.' },
+        { name: 'Banded Lat Pulldown', rx: '3×10-12/side', rpe: '7-8', rest: '60s', track: true, workingWeight: 'Band', cue: 'Anchor overhead. 2s pull, 3s return.' },
+        { name: 'Dead Bug', rx: '3×8/side', rpe: 'Form', rest: '45s', track: false, workingWeight: 'BW', cue: 'The APT brake.' },
+        { name: 'Farmer Carry', rx: '3×40s', rpe: '7-8', rest: '60s', track: true, workingWeight: 56, cue: 'Two DBs. Tall, ribs down.' },
+        { name: 'Prone Y-Raise', rx: '3×12', rpe: '7', rest: '45s', track: true, workingWeight: 7.5, cue: 'Lower traps.' },
+      ]},
+    ]},
   },
+
+  // ---------- FRI: FULL BODY C — single-leg + glute + scap ----------
   fri: {
-    full: {
-      blocks: [
-        { name: 'Main Lifts', exercises: [
-          { name: 'Goblet Squat (Kettlebell)', rx: '3×8', rpe: '7', rest: '90s', track: true,
-            warmups: [{ weight: 20, reps: 8 }],
-            workingWeight: 44,
-            cue: '3s lower, 1s hold bottom, 2s drive up. Torso VERTICAL. Heels on plates.' },
-          { name: 'Bulgarian Split Squat', rx: '3×8/side', rpe: '6', rest: '90s', track: true,
-            workingWeight: 'BW',
-            cue: '3s lower straight down, 1s hold, 2s drive up. BW only Wks 1-4. Add DBs Wk 5+.' },
-          { name: 'Machine Kas Glute Bridge', rx: '3×12', rpe: '9', rest: '90s', track: true,
-            warmups: [{ weight: 65, reps: 8 }],
-            workingWeight: 140,
-            cue: '1s drive up, 2s squeeze and pulse at top, 1s lower. TOP 30% ROM only. Chin tucked.' },
-          { name: 'Seated Leg Curl (Machine)', rx: '3×15', rpe: '8', rest: '60s', track: true,
-            warmups: [{ weight: 50, reps: 8 }],
-            workingWeight: 100,
-            cue: '2s curl, 1s squeeze, 3s SLOW negative. Butt glued to seat.' },
-        ]},
-        { name: 'Vanity Finishers', exercises: [
-          { name: 'Leg Extension (Machine)', rx: '2×17-20', rpe: '10', rest: '45s', track: true,
-            warmups: [{ weight: 50, reps: 8 }],
-            workingWeight: 100,
-            cue: '2s extend, 1s squeeze, 2s lower.' },
-          { name: 'Standing Calf Raise (Machine)', rx: '3×15', rpe: '9', rest: '45s', track: true,
-            workingWeight: 320,
-            cue: '2s raise, 1s hard squeeze, 3s SLOW negative, 1s hold stretch.' },
-        ]},
-      ],
-    },
-    quick: {
-      blocks: [
-        { name: 'Main Lifts (Quick)', exercises: [
-          { name: 'Goblet Squat (Kettlebell)', rx: '3×8', rpe: '7', rest: '60s', track: true,
-            warmups: [{ weight: 20, reps: 8 }],
-            workingWeight: 44,
-            cue: 'Torso vertical.' },
-          { name: 'Bulgarian Split Squat', rx: '3×8/side', rpe: '6', rest: '60s', track: true,
-            workingWeight: 'BW',
-            cue: 'BW.' },
-          { name: 'Machine Kas Glute Bridge', rx: '3×12', rpe: '9', rest: '60s', track: true,
-            workingWeight: 140,
-            cue: 'Top 30% ROM, pulse and squeeze.' },
-          { name: 'Seated Leg Curl', rx: '2×15', rpe: '8', rest: '45s', track: true,
-            workingWeight: 100,
-            cue: 'Slow negatives.' },
-        ]},
-      ],
-    },
-    home: {
-      blocks: [
-        { name: 'Main Lifts (@Home)', exercises: [
-          { name: 'KB Goblet Squat', rx: '3×8', rpe: '7', rest: '90s', track: true,
-            warmups: [{ weight: 20, reps: 8 }],
-            workingWeight: 42,
-            cue: 'Same pattern as gym. Max 42 lb KB.' },
-          { name: 'Bulgarian Split Squat', rx: '3×8/side', rpe: '6', rest: '90s', track: true,
-            workingWeight: 'BW',
-            cue: 'Back foot on bench. BW only for now.' },
-          { name: 'DB Hip Thrust (Bench)', rx: '3×12', rpe: '9', rest: '90s', track: true,
-            warmups: [{ weight: 30, reps: 8 }],
-            workingWeight: 56,
-            cue: 'Upper back on bench. DB across hips. Drive up, squeeze. Replaces Kas bridge.' },
-          { name: 'Nordic Curl (or Slow Eccentric)', rx: '3×6-10', rpe: 'Form', rest: '60s', track: true,
-            workingWeight: 'BW',
-            cue: 'Anchor feet. 5s lower with control. Knees on pad. Replaces leg curl.' },
-        ]},
-        { name: 'Vanity Finishers', exercises: [
-          { name: 'Single-Leg DB Calf Raise', rx: '3×15/side', rpe: '9', rest: '45s', track: true,
-            workingWeight: 56,
-            cue: 'One DB in hand, opposite leg. Stand on plate or step. Slow negative.' },
-        ]},
-      ],
-    },
+    full: { blocks: [
+      { name: 'Full Body C', exercises: [
+        { name: 'Bulgarian Split Squat (BW)', rx: '3×8/side', rpe: '6-7', rest: '90s', track: true,
+          workingWeight: 'BW',
+          cue: 'Back foot on a bench. 3s down, 1s hold, 2s up. Add DBs when bodyweight is easy. Rotate across the block with single-leg RDL or slow step-downs.' },
+        { name: 'Half-Kneeling 1-Arm DB Press', rx: '3×8/side', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 15, reps: 8 }], workingWeight: 30, cue: 'Ribs down, squeeze the down-leg glute. Shoulder-friendly.' },
+        { name: 'Cable Face Pull', rx: '3×15', rpe: 'Form', rest: '45-60s', track: true,
+          workingWeight: 22.5, cue: 'Pull to the forehead, squeeze rear delts. Rounded-shoulder work.' },
+        { name: 'DB Hip Thrust', rx: '3×10-12', rpe: '7-8', rest: '90s', track: true,
+          warmups: [{ weight: 20, reps: 8 }], workingWeight: 35, cue: 'DB across the hips. 2s squeeze at the top. EXHALE up, no breath-hold. Glutes for APT.' },
+        { name: 'Seated Cable Row', rx: '3×10', rpe: '7-8', rest: '75s', track: true,
+          workingWeight: 'Cable', cue: '2s pull to the belly, 1s squeeze, 3s slow return, slight reach. Extra upper-back volume for the rounded shoulders.' },
+        { name: 'Lateral Raise', rx: '2×12-15', rpe: '8-9', rest: '45s', track: true,
+          workingWeight: 12.5, cue: 'Soft elbows, last set near failure.' },
+      ]},
+      { name: 'End-Range Finish', exercises: [
+        { name: 'Deep Squat Hold', rx: '2×30s', rpe: 'Stretch', rest: '30s', track: false,
+          workingWeight: 'BW', cue: 'Deep squat, sit tall, breathe into the hips.' },
+        { name: 'Frog / Butterfly', rx: '1-2 min', rpe: 'Stretch', rest: 'ss', track: false,
+          workingWeight: 'BW', cue: 'Sink into the hips, breathe. Adductors + hip opening (doubles as pelvic floor).' },
+      ]},
+    ]},
+    quick: { blocks: [
+      { name: 'Full Body C (Quick)', exercises: [
+        { name: 'Bulgarian Split Squat (BW)', rx: '2×8/side', rpe: '6-7', rest: '60s', track: true, workingWeight: 'BW', cue: 'Controlled.' },
+        { name: 'Half-Kneeling 1-Arm DB Press', rx: '2×8/side', rpe: '7-8', rest: '60s', track: true, workingWeight: 30, cue: 'Ribs down.' },
+        { name: 'Cable Face Pull', rx: '2×15', rpe: 'Form', rest: '45s', track: true, workingWeight: 22.5, cue: 'Squeeze rear delts.' },
+        { name: 'DB Hip Thrust', rx: '2×10-12', rpe: '7-8', rest: '60s', track: true, workingWeight: 35, cue: 'Exhale up.' },
+        { name: 'Seated Cable Row', rx: '2×10', rpe: '7-8', rest: '60s', track: true, workingWeight: 'Cable', cue: 'Pull, squeeze, slow return.' },
+      ]},
+    ]},
+    home: { blocks: [
+      { name: 'Full Body C (@Home)', exercises: [
+        { name: 'Bulgarian Split Squat (BW)', rx: '3×8/side', rpe: '6-7', rest: '90s', track: true, workingWeight: 'BW', cue: 'Back foot on bench.' },
+        { name: 'Half-Kneeling 1-Arm DB Press', rx: '3×8/side', rpe: '7-8', rest: '90s', track: true, warmups: [{ weight: 15, reps: 8 }], workingWeight: 30, cue: 'Ribs down.' },
+        { name: 'Band Face Pull', rx: '3×15', rpe: 'Form', rest: '45s', track: true, workingWeight: 'Band', cue: 'Anchor eye level, pull to forehead.' },
+        { name: 'DB Hip Thrust (Bench)', rx: '3×10-12', rpe: '7-8', rest: '90s', track: true, warmups: [{ weight: 30, reps: 8 }], workingWeight: 56, cue: 'Upper back on bench. Exhale up.' },
+        { name: '1-Arm DB Row', rx: '3×10/side', rpe: '7-8', rest: '75s', track: true, workingWeight: 50, cue: 'Subs the cable row. Pull, squeeze, slow return. Rowing bias.' },
+        { name: 'Lateral Raise', rx: '2×12-15', rpe: '8-9', rest: '45s', track: true, workingWeight: 12.5, cue: 'Last set near failure.' },
+      ]},
+    ]},
   },
+
 };
 
 // Compose workout block with title/phase wrapper
@@ -917,25 +831,24 @@ function getWorkoutBlock(dayKey, mode) {
 // ============ MOBILITY ============
 
 const TUE_MOBILITY = {
-  title: 'Feet, Foundation & Neck', phase: 'MOB', type: 'workout', duration: '20 min',
+  title: 'Feet & Ankle', phase: 'MOB', type: 'workout', duration: '18 min',
   steps: [
-    { name: 'Tennis Ball Foot Roll (2 min/foot)', detail: 'Roll 1" per second. 3 lanes: inside, center, outside. Hit a knot → press 10-15s.', timer: 240 },
-    { name: 'Single Leg Balance Eyes Closed (3×30s/leg)', detail: 'Grip floor with toes. Tripod foot.' },
-    { name: 'Banded Ankle Distraction (2 min/side)', detail: 'Band pulls ankle back. Knee forward over toes slowly.', timer: 240 },
-    { name: 'Single-Leg Glute Bridge (3×12/leg)', detail: '1s drive up, 2s squeeze, 2s lower.' },
-    { name: 'Neck Stretches (90s)', detail: 'Ear to shoulder 30s each side. Chin to chest 30s.', timer: 90 },
-    { name: 'Tai Chi / DDP Yoga Flow (10 min)', detail: 'Slow, intentional.', timer: 600 },
+    { name: 'Tennis Ball Foot Roll (2 min/foot)', detail: 'Roll slowly, 3 lanes: inside, center, outside. Hit a knot → press 10-15s.', timer: 240 },
+    { name: 'Short-Foot + Toe Control (2×10)', detail: 'Dome the arch WITHOUT curling the toes, then lift and spread the toes. Trains the muscle that holds the arch up. Do it at the desk too.' },
+    { name: 'Tibialis Raises (2×15)', detail: 'Heels down, lift the toes/forefoot against a light KB or band. Shin, ankle, knee resilience.' },
+    { name: 'Single-Leg Calf Raise (2×12/side)', detail: 'Slow up, slow down off a step. Ankle and foot. Ease in with the healing foot.' },
+    { name: 'Banded Ankle Distraction (2 min/side)', detail: 'Band pulls the ankle back, drive the knee over the toes slowly. Dorsiflexion.', timer: 240 },
+    { name: 'Single-Leg Balance Eyes Closed (3×30s/leg)', detail: 'Grip the floor with the toes. Tripod foot.' },
   ],
 };
 
 const THU_MOBILITY = {
-  title: 'Hips, Core & Posture', phase: 'MOB', type: 'workout', duration: '20 min',
+  title: 'Hips & Posture', phase: 'MOB', type: 'workout', duration: '14 min',
   steps: [
-    { name: 'All-Fours Breathing (5 min)', detail: '4s nose inhale, 6s mouth exhale. Ribs down.', timer: 300 },
-    { name: 'Seated Leg Lift Over Block (3×10/leg)', detail: '2s up, 1s hold, 2s down. Sit tall.' },
-    { name: 'Chinese Plank Supine (3×45s)', detail: 'Upper back on couch, heels on floor. Drive hips up.' },
-    { name: 'Couch Stretch + Chin Tuck (2 min/side)', detail: 'Back foot on couch. Squeeze glute. Tuck chin, grow tall.', timer: 240 },
-    { name: 'Tai Chi / DDP Yoga Flow (10 min)', detail: 'Slow, intentional.', timer: 600 },
+    { name: 'All-Fours Breathing (5 min)', detail: '4s nose inhale, 6s mouth exhale. Ribs down. Posterior rib expansion.', timer: 300 },
+    { name: 'Couch Stretch + Chin Tuck (2 min/side)', detail: 'Back foot up, squeeze the glute, tuck the pelvis, add a chin tuck. Hip flexor (APT) + forward head.', timer: 240 },
+    { name: 'Frog / Butterfly (2 min)', detail: 'Sink into the hips, breathe. Adductors + pelvic floor opening.', timer: 120 },
+    { name: 'Quadruped T-Spine Rotation (1-2×5/side)', detail: 'Hand behind head, rotate the elbow up toward the ceiling, pause 1-2s at end range, exhale into it. True thoracic rotation.' },
   ],
 };
 
@@ -1301,10 +1214,76 @@ function renderStep(step, stepId) {
       <div class="step-body">
         <div class="step-name ${done ? 'done' : ''}">${step.name}</div>
         ${step.detail ? `<div class="step-detail">${step.detail}</div>` : ''}
+        ${renderFormPanel(step.name)}
         ${timerBtn ? `<div class="step-actions">${timerBtn}</div>` : ''}
       </div>
     </div>
   `;
+}
+
+// ============ FORM GUIDE (in-app movement breakdowns) ============
+const FORM_GUIDE = {
+  "KB Romanian Deadlift": { setup: "Stand tall, KB in front at the hips, feet hip width, soft knees.", move: "Push the hips back, bell sliding down the thighs to mid-shin with a flat back, then drive the hips forward to stand and squeeze the glutes.", tempo: "2s down, 1s pause, 1s up.", feel: "Hamstrings and glutes, not the low back.", dont: "Round the back, squat it, or lean back and flare the ribs at the top. Exhale up, never hold your breath." },
+  "Low-Incline DB Press": { setup: "Bench 15 to 30 degrees, palms facing each other, start at lower-chest level.", move: "Press up and slightly together, lower to a gentle stretch, blades set down and back.", tempo: "2s press, 1s hold, 3s lower.", feel: "Chest and front shoulder, no joint pinch.", dont: "Crank a big low-back arch, flare the elbows to a hard 90, or bounce the bottom." },
+  "Chest-Supported DB Row": { setup: "Chest down on the incline bench, dumbbells hanging.", move: "Row to the lower ribs leading with the elbows, squeeze the blades, lower slow and reach forward at the bottom.", tempo: "2s pull, 1s squeeze, 2s lower, 1s reach.", feel: "Mid-back. The reach is the rounded-shoulder fix.", dont: "Shrug toward the ears or jerk the weight." },
+  "Pallof Press": { setup: "Band or cable at chest height to your side, handle at the sternum, stand side-on.", move: "Press straight out and resist the rotation, hold a beat, return slow.", feel: "The trunk working to not twist.", dont: "Let the torso rotate, lean away, or hold your breath. Ribs down, keep breathing." },
+  "Band Pallof Press": { setup: "Band anchored at chest height to your side, handle at the sternum.", move: "Press straight out and resist the rotation, hold a beat, return slow.", feel: "The trunk working to not twist.", dont: "Let the torso rotate or hold your breath." },
+  "Suitcase Carry": { setup: "One KB in one hand at your side.", move: "Stand tall and walk, shoulders level, ribs down, no lean toward or away.", feel: "The opposite side working to keep you upright.", dont: "Hike the hip or lean. If you lean, it is too heavy." },
+  "Lateral Raise": { setup: "Light dumbbells at the sides, soft elbows.", move: "Lead with the elbows out to shoulder height, slight forward angle, control down.", feel: "Side delts.", dont: "Swing, shrug with the traps, or go above shoulder height." },
+  "Loaded Hinge Stretch Hold": { move: "Light KB, hinge to your end-range hamstring stretch, flat back, hold and breathe, sink deeper on each exhale.", note: "It is a loaded stretch, not a lift." },
+  "Couch Stretch": { setup: "Back foot up on a bench or wall, front foot forward in a lunge, kneeling on the back knee.", move: "Squeeze the back glute and tuck the pelvis under to feel the front of the hip and quad, tall torso, breathe.", feel: "Front of the hip. Direct hip-flexor length for APT.", dont: "Arch the low back to get deeper." },
+  "Couch Stretch + Chin Tuck": { setup: "Couch stretch position, back foot up, glute squeezed, pelvis tucked.", move: "Hold the stretch and add a chin tuck so you hit the hip flexor and the forward head together.", feel: "Front of the hip plus the front of the neck working." },
+  "KB Goblet Squat": { setup: "KB at the chest by the horns, feet about shoulder width, toes slightly out.", move: "Sit straight down between the hips, knees over toes, heels flat, tall torso, then drive up.", tempo: "3s down, 1s hold, 2s up.", feel: "Quads and glutes, balanced.", dont: "Let the heels lift, knees cave, or chest fold. Ribs down at the top." },
+  "Half-Kneeling Landmine Press": { setup: "Half-kneeling, down knee same side as the pressing arm, bar racked at the shoulder.", move: "Press up and slightly forward along the bar arc, lower controlled, down-leg glute squeezed the whole set.", feel: "Shoulder on a friendly angle with the trunk braced.", dont: "Arch the back to press. If you cannot press without arching, drop the load." },
+  "Half-Kneeling 1-Arm KB Press": { setup: "Half-kneeling, KB racked at the shoulder, down-leg glute on.", move: "Press up without arching, lower controlled.", dont: "Arch to press. Ribs down, glute on." },
+  "Half-Kneeling 1-Arm Lat Pulldown": { setup: "Half-kneeling under a high cable, single handle in the same-side hand.", move: "Pull to the ribs leading with the elbow, squeeze the lat, slow return.", feel: "Lat and mid-back, down-leg glute on, ribs down.", dont: "Lean back to yank it or use momentum." },
+  "Banded Lat Pulldown": { setup: "Band anchored overhead, kneeling.", move: "Pull to the ribs leading with the elbow, squeeze the lat, 3s slow return.", feel: "Lat and mid-back, ribs down.", dont: "Lean back or use momentum." },
+  "Dead Bug": { setup: "On your back, arms at the ceiling, knees over hips at 90, low back pressed flat.", move: "Slowly extend opposite arm and leg, exhale as you reach, keep the back flat, return and switch.", feel: "Deep abs holding ribs and pelvis together. Your APT brake.", dont: "Let the low back arch off the floor, take a smaller range instead. Do not hold your breath." },
+  "Farmer Carry": { setup: "A weight in each hand at the sides.", move: "Stand tall, ribs down, shoulders down, breathe, walk under control.", feel: "Grip and whole-body postural endurance.", dont: "Lean, shrug, or shuffle." },
+  "Prone Y-Raise": { setup: "Face down, arms overhead in a Y, thumbs up.", move: "Lift the arms a few inches by squeezing the lower traps and mid-back, low and slow, lower.", feel: "Low between the shoulder blades, not the tops of the shoulders.", dont: "Shrug, yank, or crank the neck and low back up. Very light or no weight." },
+  "Wall Slide": { setup: "Back flat on a wall, arms in a goalpost, wrists and elbows touching.", move: "Slide the arms overhead keeping contact, hold 3 to 5s at the top, return.", feel: "Serratus and shoulder, ribs down.", dont: "Arch the low back off the wall to reach. Alternative is a lying banded overhead pulldown." },
+  "Deep Squat Hold": { move: "Drop into a deep squat, heels down, hold a doorframe if needed, sit tall, pry the knees out with the elbows, breathe into the hips." },
+  "Bulgarian Split Squat": { setup: "Back foot up on a bench, front foot forward so the knee tracks over the mid-foot.", move: "Drop straight down, slight forward lean is fine, drive up through the front heel. Bodyweight first, add dumbbells later.", feel: "Front-leg quad and glute.", dont: "Let the front knee cave or stand too narrow. Use a wall for balance early." },
+  "Half-Kneeling 1-Arm DB Press": { setup: "Half-kneeling, DB at the shoulder, down-leg glute on.", move: "Press overhead without arching, lower controlled.", feel: "Shoulder with the trunk holding you stacked.", dont: "Arch to press. Ribs down, glute on." },
+  "Cable Face Pull": { setup: "Rope at upper-chest or face height.", move: "Pull toward the forehead, elbows high, rotate so the knuckles face behind you, squeeze the rear delts, slow return.", feel: "Rear delts and upper back. Direct rounded-shoulder work.", dont: "Lean back into a row or go too heavy to hold the high elbows." },
+  "Band Face Pull": { setup: "Band anchored at eye level.", move: "Pull toward the forehead, elbows high, knuckles back, squeeze the rear delts, slow return.", feel: "Rear delts and upper back.", dont: "Lean back or go too heavy." },
+  "DB Hip Thrust": { setup: "Upper back on a bench, DB across the hips on a pad, feet flat hip width.", move: "Drive through the heels and squeeze the glutes to a flat tabletop, ribs down and a slight tuck at the top.", tempo: "1s up, 2s squeeze, 1s down.", feel: "Glutes finishing the rep, not the low back. Exhale up, never bear down. This one matters most for the pelvic floor.", dont: "Hyperextend and flare the ribs at the top, or hold your breath." },
+  "Seated Cable Row": { setup: "Sit tall, slight forward reach at the start.", move: "Pull to the belly leading with the elbows, squeeze the blades, slow return with a reach.", feel: "Mid-back, extra volume for the rounded shoulders.", dont: "Heave with the low back or shrug." },
+  "1-Arm DB Row": { setup: "One hand and knee on a bench, DB hanging.", move: "Row to the hip leading with the elbow, squeeze, slow lower with a small reach.", feel: "Mid-back and lat. Home sub for the seated row.", dont: "Twist the torso open or yank." },
+  "Frog / Butterfly": { move: "Frog is on all fours with knees wide, rocking the hips back. Butterfly is seated with soles together letting the knees fall open.", feel: "Hips and adductors opening, doubles as pelvic floor down-training.", dont: "Force or bounce. Sink in on exhales and release." },
+  "Single-Leg RDL": { setup: "Stand on one leg holding a DB or KB.", move: "Hinge at the hip, reach the weight down as the back leg lifts behind you, flat back, return tall.", feel: "Standing hamstring and glute, plus balance.", dont: "Round the back or let the hips rotate open." },
+  "Step-Down": { setup: "Stand on a low step or box on one leg.", move: "Slowly lower the other heel to lightly tap the floor with control, drive back up.", feel: "Front-leg quad and glute, knee tracking over the foot.", dont: "Drop fast or let the knee cave." },
+  "Incline Walk": { move: "Treadmill 5 to 8 percent incline, easy pace, nose breathing, 3 to 5 min.", feel: "Just warming up, not training yet." },
+  "Band Pull-Aparts": { setup: "Band at chest height, arms straight out front.", move: "Pull the band apart to the chest by squeezing the shoulder blades, slow return.", feel: "Mid-back and rear delts." },
+  "KB Halos": { setup: "Light KB by the horns at the chest.", move: "Circle it around the head close to the scalp, both directions, ribs down.", feel: "Shoulders and upper back warming up." },
+  "Thoracic Rotations": { move: "On all fours, one hand behind the head, rotate that elbow down and across then up to the ceiling, exhale at the top.", feel: "Upper-back rotation, hips square." },
+  "Tennis Ball Foot Roll": { move: "Roll the arch slowly in three lanes, inside, center, outside. Pause on tender spots for 10 to 15s.", feel: "Plantar surface and foot intrinsics." },
+  "Short-Foot + Toe Control": { move: "Foot flat, dome the arch by drawing the ball of the foot slightly toward the heel without curling the toes, hold, release. Then lift the big toe while the others stay down, and reverse.", feel: "The muscles that hold your arch up. The collapsed-arch fix.", note: "Do the short-foot piece under the desk too." },
+  "Tibialis Raises": { setup: "Heels down against a wall or off a low step.", move: "Lift the toes and forefoot toward the shins against a band or light KB, squeeze the shin, lower slow.", feel: "Front of the shin." },
+  "Single-Leg Calf Raise": { setup: "One foot, ball of the foot on a step edge for full range.", move: "Rise up slow, lower slow below the step, grip the floor with the toes.", dont: "Rush it. Ease in on the healing foot and back off if it complains." },
+  "Single Leg Balance Eyes Closed": { move: "Stand on one leg, set a tripod foot (big toe, little toe, heel), grip the floor, then close the eyes. Wall to start.", feel: "Foot and ankle stability." },
+  "Banded Ankle Distraction": { setup: "Band low around the front of the ankle, anchored behind you, step forward so it pulls the ankle back.", move: "Drive the knee forward over the toes with the heel planted, oscillate gently.", feel: "Restoring dorsiflexion." },
+  "All-Fours Breathing": { move: "On all fours, round the upper back slightly and tuck the tailbone a touch. Inhale through the nose into the back and sides of the ribs, long exhale through the mouth.", feel: "Back-rib expansion, the 360 pattern with gravity helping." },
+  "Quadruped T-Spine Rotation": { move: "On all fours, one hand behind the head, rotate that elbow down and under then up and open to the ceiling, follow with the eyes, pause and exhale at the top.", feel: "Upper back only, hips and low back stay still." },
+  "360 Breathing": { move: "Hands on the lower ribs. Inhale through the nose so the ribs expand sideways and into the back, not the chest rising or just the belly. Long exhale, ribs settle.", feel: "Sets rib position and down-regulates you." },
+  "Chin Tucks": { setup: "Back of the head on the wall.", move: "Glide the chin straight back into a double chin and grow tall, hold 5s, release 2s.", feel: "Forward-head reset.", dont: "Tilt the head. It is a glide, not a nod." },
+  "Active Hang": { move: "Hang from the bar and actively pull the shoulders down away from the ears, push the chest through the arms slightly, breathe. Feet can assist.", dont: "Let it be a limp dead hang. Stop if the shoulder pinches." },
+  "90/90 Breathing": { setup: "On your back, lower legs on a chair, hips and knees at 90, low back lightly flat.", move: "Inhale nose 4s into the back ribs, exhale mouth 8s, and on each exhale let the pelvic floor and everything fully release and drop.", feel: "Down-regulation and pelvic floor down-training.", dont: "Clench or kegel. The release is the point." },
+  "Thoracic Extension": { setup: "Foam roller across the upper back at bra-line, hands supporting the head.", move: "Lean back over the roller a few seconds, breathe, move up an inch, repeat.", dont: "Crank the low back. Extend over the upper back only." },
+  "Psoas Release": { move: "Lie face down, ball just inside the hip bone at the front of the hip, sink your weight in, breathe slow, 4s in 6s out.", feel: "Hip-flexor release that opens the door for the APT work." },
+  "Hip-Opening Down-Train": { move: "Happy baby into butterfly, full exhales, let everything go.", feel: "Pelvic floor down-training.", note: "Log how it feels 0 to 10 to track the trial." },
+};
+
+function normName(n) {
+  return n.replace(/\([^)]*\)/g, '').replace(/×.*$/, '').replace(/\s+/g, ' ').trim();
+}
+
+function renderFormPanel(name) {
+  const f = FORM_GUIDE[normName(name)];
+  if (!f) return '';
+  const row = (label, txt) => txt ? `<div class="howto-row"><span class="howto-label">${label}</span>${txt}</div>` : '';
+  const body = row('Set up', f.setup) + row('Move', f.move) + row('Tempo', f.tempo) + row('Feel it', f.feel) + row('Avoid', f.dont) + row('Note', f.note);
+  return `<details class="howto"><summary>How to</summary><div class="howto-body">${body}</div></details>`;
 }
 
 function renderExercise(ex, exId) {
@@ -1353,6 +1332,7 @@ function renderExercise(ex, exId) {
         <div class="exercise-rx">${ex.rx}</div>
       </div>
       <div class="exercise-cue">${ex.cue}</div>
+      ${renderFormPanel(ex.name)}
       ${(rpe || rest) ? `<div class="exercise-meta">${rpe}${rest}</div>` : ''}
       ${setsHtml}
       <div class="exercise-actions">
